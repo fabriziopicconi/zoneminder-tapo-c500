@@ -224,6 +224,10 @@ my $step = 15;
 
 ## Useful links and thanks to :
 
+https://github.com/JurajNyiri/pytapo
+
+https://github.com/oparm/zoneminder-tapo-c200
+
 https://research.nccgroup.com/2020/07/31/lights-camera-hacked-an-insight-into-the-world-of-popular-ip-cameras/
 
 https://github.com/likaci/mercury-ipc-control
