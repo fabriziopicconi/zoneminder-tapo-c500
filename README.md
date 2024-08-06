@@ -12,18 +12,6 @@ A [ZoneMinder](https://zoneminder.com/) PTZ control script for the Tapo C200 cam
 - Reset (camera recalibrates and returns to its default position)
 - Reboot
 
-## Demos
-
-### Pan/Tilt
-
-https://user-images.githubusercontent.com/83918778/117584495-a708e000-b10d-11eb-98a3-c0f087e0ff37.mp4
-
-### Presets
-https://user-images.githubusercontent.com/83918778/117584497-a8d2a380-b10d-11eb-9d0c-7d544fdc88d6.mp4
-
-### Lens Mask
-https://user-images.githubusercontent.com/83918778/117584499-a96b3a00-b10d-11eb-9521-35f39ba2f2d3.mp4
-
 ## Reset & Reboot explanations
 
 ### Reset
