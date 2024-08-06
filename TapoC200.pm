@@ -36,7 +36,11 @@ use Time::HiRes qw(usleep);
 use Data::Dumper;
 use LWP::UserAgent;
 use JSON::Parse 'parse_json';
+use Bytes::Random::Secure qw(random_bytes_hex);
+use Digest::SHA qw(sha256_hex sha256);
 use Digest::MD5 qw(md5_hex);
+use Crypt::CBC;
+use MIME::Base64;
 use JSON;
 
 require ZoneMinder::Base;
@@ -74,6 +78,7 @@ sub open
         Error("Control Address URL must be entered as 'admin:admin_password\@host:port', exiting");
         Exit(0);
     }
+    $self->{retry}=1;
 
     if ($host =~ /([^:]+):(.+)/) {
         $host = $1;
@@ -84,7 +89,9 @@ sub open
 
     $self->{user} = $user;
     $self->{pass} = $pass;
+    $self->{host} = "$host:$port";
     $self->{BaseURL} = "https://$host:$port";
+    $self->{hashed_password} = uc(sha256_hex($self->{pass}));
 
     # Disable verification of Tapo C200 self-signed certificate
     use LWP::UserAgent;
@@ -108,7 +115,6 @@ sub open
     
     Info("Tapo C200 Controller opened");
 }
-
 sub close
 { 
     my $self = shift;
@@ -130,6 +136,42 @@ sub printMsg
         Debug($msg);
     }
 }
+sub calcTag
+{
+    my $self = shift;
+    my $payload = shift;
+
+    my $tag = uc(sha256_hex(uc(sha256_hex($self->{pass})).$self->{cnonce}));
+    $tag = uc(sha256_hex($tag.$payload.$self->{sequence}));
+}
+sub encryptRequest
+{
+    my $self = shift;
+    my $msg = shift;
+
+    Debug("clean message: $msg");
+    my $cipher = Crypt::CBC->new(
+        -key         => $self->{lsk},
+        -iv          => $self->{ivb},
+        -cipher      => 'Cipher::AES',
+        -literal_key => 1,
+        -header      => "none",
+        -padding     => "standard",
+        -keysize     => 16 );
+    my $ciphertext = $cipher->encrypt($msg);
+    Debug("encrypted: ".encode_base64($ciphertext,""));
+    return($ciphertext);
+}
+
+sub generateEncryptionToken
+{
+    my $self = shift;
+    my $type = shift;
+    my $snonce = shift;
+    my $hashedKey = uc(sha256_hex($self->{cnonce}.uc(sha256_hex($self->{pass})).$snonce));
+    Debug("hashedKey ".$hashedKey);
+    return(substr(sha256($type.$self->{cnonce}.$snonce.$hashedKey),0,16));
+}
 
 sub setToken
 {
@@ -137,40 +179,70 @@ sub setToken
 
     my $result = undef;
     my $token = undef;
+    my $snonce = undef;
 
-    my $hashed_password = uc(md5_hex($self->{pass}));
+    $self->{cnonce} = uc(random_bytes_hex(8));
+    my $payload = '{"method":"login","params":{"cnonce":"'.$self->{cnonce}.'","encrypt_type": "3","username":"'.$self->{user}.'"}}';
+    Debug("first phase payload ".$payload);
+    my $req1 = HTTP::Request->new(POST => $self->{BaseURL});
+    $req1->header('User-Agent' => 'Tapo CameraClient Android');
+    $req1->header('Accept-Encoding' => 'gzip, deflate');
+    $req1->header('Accept' => 'application/json');
+    $req1->header('Connection' => 'close');
+    $req1->header('Host' => $self->{host});
+    $req1->header('Referer' => $self->{BaseURL});
+    $req1->header('requestByApp' => 'true');
+    $req1->header('Content-Type' => 'application/json; charset=UTF-8');
+    $req1->header('Content-Length' => length($payload));
+    $req1->content($payload);
+    my $response1 = $self->{ua}->request($req1);
 
-    my $payload = '{"method":"login","params":{"hashed":"true","password":"'.$hashed_password.'","username":"'.$self->{user}.'"}}';
+    my $response2 = undef;
+    if ($response1->is_success) {
+       Debug("response first phase OK");
+       $snonce = decode_json($response1->content)->{result}->{data}->{nonce};
+       Debug("server nonce ".$snonce);
+       if ($snonce eq "") {
+          Exit(0);
+       }
+       my $digest_pass = uc(sha256_hex($self->{hashed_password}.$self->{cnonce}.$snonce));
+       my $payload = '{"method": "login","params":{"cnonce": "'.$self->{cnonce}.'","encrypt_type": "3","digest_passwd": "'.$digest_pass.$self->{cnonce}.$snonce.'","username": "admin"}}';
+       Debug("second phase payload".$payload);
 
-    my $req = HTTP::Request->new(POST => $self->{BaseURL});
-
-    $req->header('content-type' => 'application/json');
-    $req->header('Host' => $self->{BaseURL});
-    $req->header('content-length' => length($payload));
-    $req->header('accept-encoding' => 'gzip, deflate');
-    $req->header('requestByApp' => 'true');
-    $req->header('connection' => 'close');
-
-    $req->content($payload);
-
-    my $response = $self->{ua}->request($req);
-
-    if ($response->is_success) {
-
-        my $cmd_error_code = decode_json($response->content)->{error_code};
-
+       my $req2 = HTTP::Request->new(POST => $self->{BaseURL});
+       $req2->header('User-Agent' => 'Tapo CameraClient Android');
+       $req2->header('Accept-Encoding' => 'gzip, deflate');
+       $req2->header('Accept' => 'application/json');
+       $req2->header('Connection' => 'close');
+       $req2->header('Host' => $self->{host});
+       $req2->header('Referer' => $self->{BaseURL});
+       $req2->header('requestByApp' => 'true');
+       $req2->header('Content-Type' => 'application/json; charset=UTF-8');
+       $req2->header('Content-Length' => length($payload));
+       $req2->content($payload);
+       $response2 = $self->{ua}->request($req2);
+    } else {
+       Error("FAIL init phase response1".$response1.as_string());
+       Exit(0);
+    }
+    if ($response2->is_success) {
+        my $cmd_error_code = decode_json($response2->content)->{result}->{error_code};
         if ($cmd_error_code == 0) {
-            $self->{token} = decode_json($response->content)->{result}->{stok};
+            $self->{token} = decode_json($response2->content)->{result}->{stok};
+            $self->{sequence} = decode_json($response2->content)->{result}->{start_seq};
+            Debug("token -->".$self->{token});
+            Debug("sequence -->".$self->{sequence});
+            $self->{lsk} = $self->generateEncryptionToken("lsk", $snonce);
+            $self->{ivb}=$self->generateEncryptionToken("ivb", $snonce);
 
-            Info("Token retrieved for $self->{BaseURL}");
-
+            Debug("Token retrieved for ".$self->{BaseURL});
             return $self->{token};
         } elsif ($cmd_error_code == -40401) {
             Error("Invalid credentials for $self->{BaseURL}, exiting");
             Exit(0);
         }
     } else {
-        Error("Could send request to retrieve token for $self->{BaseURL} : $response->status_line()");
+        Error("Could send request to retrieve token for $self->{BaseURL} : $response2->status_line()");
         
         return undef;
     }
@@ -183,38 +255,60 @@ sub sendCmd
 
     my $result = undef;
     my $token = undef;
+    my $sequence = 0;
+
+    my $encmsg = encode_base64($self->encryptRequest($cmd),"");
+    my $payload='{"method": "securePassthrough", "params": {"request": "'.$encmsg.'"}}';
+    printMsg("Send command seq:[$self->{sequence}] for $self->{BaseURL}/stok=$self->{token}/ds, $cmd");
 
     my $req = HTTP::Request->new(POST => "$self->{BaseURL}/stok=$self->{token}/ds");
-
-    $req->header('content-type' => 'application/json');
-    $req->header('Host' => $self->{BaseURL});
-    $req->header('content-length' => length($cmd));
-    $req->header('accept-encoding' => 'gzip, deflate');
+    $req->header('User-Agent' => 'Tapo CameraClient Android');
+    $req->header('Accept-Encoding' => 'gzip, deflate');
+    $req->header('Accept' => 'application/json');
+    $req->header('Connection' => 'close');
+    $req->header('Host' => $self->{host});
+    $req->header('Referer' => $self->{BaseURL});
     $req->header('requestByApp' => 'true');
-    $req->header('connection' => 'close');
-
-    $req->content($cmd);
+    $req->header('Content-Type' => 'application/json; charset=UTF-8');
+    $req->header('Seq' => $self->{sequence});
+    $req->header(':Tapo_tag' => $self->calcTag($payload));
+    $req->header('Content-Length' => length($payload));
+    $req->content($payload);
 
     my $response = $self->{ua}->request($req);
+    $self->{sequence}++;
 
     if ($response->is_success) {
         my $cmd_error_code = decode_json($response->content)->{error_code};
 
         if ($cmd_error_code == 0) {
             printMsg("Command sent successfully to $self->{BaseURL} : $cmd");
-        } elsif ($cmd_error_code == -40401) {
-            printMsg("Token expired for $self->{BaseURL}, retrying : $cmd");
-
-            $self->setToken();
-            $self->sendCmd($cmd);
+            $self->{retry}=1;
+        } elsif ($cmd_error_code == -40401 || $cmd_error_code == -40407) {
+            if ($self->{retry}) {
+                printMsg("Token expired for $self->{BaseURL}, retrying : $cmd");
+                $self->{retry}=0;
+                $self->setToken();
+                $self->sendCmd($cmd);
+            } else {
+                $self->{retry}=1;
+            }
         } else {
             Error("Camera failed to execute command to $self->{BaseURL} : $cmd");
             Error(Dumper($response->content));
         }
-
         return 1;
     } else {
-        Error("Could not send command to $self->{BaseURL} : $response->status_line()");
+        Error("Command Fail");
+        Error(Dumper($response->content));
+        if ($self->{retry}) {
+            $self->{retry}=0;
+            $self->setToken();
+            $self->sendCmd($cmd);
+        } else {
+            $self->{retry}=1;
+            return 1;
+        }
     }
 }
 
@@ -246,7 +340,7 @@ sub moveConRight
 {
     my $self = shift;
     printMsg("Move Right");
-
+    $self->sendCmd("{'method': 'multipleRequest', 'params': {'requests': [{'method': 'getDeviceInfo', 'params': {'device_info': {'name': ['basic_info']}}}]}}");
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"'.$step.'","y_coord":"0"}}}');
 }
 
