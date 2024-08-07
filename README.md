@@ -2,6 +2,12 @@
 
 A [ZoneMinder](https://zoneminder.com/) PTZ control script for the Tapo C200 camera.
 
+Tested on:
+
+- Ubuntu: 24.04 LTS server
+- zoneminder: 1.36.33
+- Tapo C500: 1.1.4
+
 Thanks to [oparm](https://github.com/oparm) for solid background of this work
 
 ## Features
