@@ -16,7 +16,7 @@ Thanks to [oparm](https://github.com/oparm) for solid background of this work
 - Zoom (through ZoneMinder)
 - Sleep : Lens Mask On
 - Wake : Lens Mask Off
-- Up to 8 presets (not working at the moment)
+- Up to 8 presets
 - Reset (camera recalibrates and returns to its default position)
 - Reboot
 
