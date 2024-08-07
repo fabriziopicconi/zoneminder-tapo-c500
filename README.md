@@ -2,7 +2,7 @@
 
 A [ZoneMinder](https://zoneminder.com/) PTZ control script for the Tapo C200 camera.
 
-Thanks to [oparm](https://github.com/oparm) for background of this work
+Thanks to [oparm](https://github.com/oparm) for solid background of this work
 
 ## Features
 - Pan
