@@ -43,51 +43,49 @@ sudo systemctl restart zoneminder
 Make sure it has the same permissions as the existing control scripts in that directory :
 
 <pre>
-root@security:/usr/share/perl5/ZoneMinder/Control# ls -alh
-total 584K
-drwxr-xr-x 2 root root 4.0K May  9 20:08 .
-drwxr-xr-x 5 root root 4.0K May  6 22:27 ..
--rw-r--r-- 1 root root  12K Apr 20 01:34 3S.pm
--rw-r--r-- 1 root root  14K Apr 20 01:34 Amcrest_HTTP.pm
--rw-r--r-- 1 root root  12K Apr 20 01:34 AxisV2.pm
--rw-r--r-- 1 root root  18K Apr 20 01:34 Dahua.pm
--rw-r--r-- 1 root root 4.8K Apr 20 01:34 DCS3415.pm
--rw-r--r-- 1 root root 7.3K Apr 20 01:34 DCS5020L.pm
--rw-r--r-- 1 root root  13K Apr 20 01:34 DericamP2.pm
--rw-r--r-- 1 root root  23K Apr 20 01:34 FI8608W_Y2k.pm
--rw-r--r-- 1 root root  26K Apr 20 01:34 FI8620_Y2k.pm
--rw-r--r-- 1 root root 6.2K Apr 20 01:34 FI8908W.pm
--rw-r--r-- 1 root root 7.6K Apr 20 01:34 FI8918W.pm
--rw-r--r-- 1 root root  22K Apr 20 01:34 FI9821W_Y2k.pm
--rw-r--r-- 1 root root  23K Apr 20 01:34 FI9831W.pm
--rw-r--r-- 1 root root 8.2K Apr 20 01:34 Floureon.pm
--rw-r--r-- 1 root root 9.5K Apr 20 01:34 FOSCAMR2C.pm
--rw-r--r-- 1 root root  12K Apr 20 01:34 HikVision.pm
--rw-r--r-- 1 root root 6.9K Apr 20 01:34 IPCAMIOS.pm
--rw-r--r-- 1 root root 8.1K Apr 20 01:34 IPCC7210W.pm
--rw-r--r-- 1 root root 6.9K Apr 20 01:34 Keekoon.pm
--rw-r--r-- 1 root root 9.6K Apr 20 01:34 LoftekSentinel.pm
--rw-r--r-- 1 root root  11K Apr 20 01:34 M8640.pm
--rw-r--r-- 1 root root 7.2K Apr 20 01:34 MaginonIPC.pm
--rw-r--r-- 1 root root 4.6K Apr 20 01:34 mjpgStreamer.pm
--rw-r--r-- 1 root root 4.6K Apr 20 01:34 Ncs370.pm
--rw-r--r-- 1 root root  25K Apr 20 01:34 Netcat.pm
--rw-r--r-- 1 root root 8.7K Apr 20 01:34 onvif.pm
--rw-r--r-- 1 root root 6.6K Apr 20 01:34 PanasonicIP.pm
--rw-r--r-- 1 root root  18K Apr 20 01:34 PelcoD.pm
--rw-r--r-- 1 root root  19K Apr 20 01:34 PelcoP.pm
--rw-r--r-- 1 root root 9.7K Apr 20 01:34 PSIA.pm
--rw-r--r-- 1 root root  39K Apr 20 01:34 Reolink.pm
--rw-r--r-- 1 root root 6.3K Apr 20 01:34 SkyIPCam7xx.pm
--rw-r--r-- 1 root root 8.2K Apr 20 01:34 Sony.pm
--rw-r--r-- 1 root root 7.7K Apr 20 01:34 SPP1802SWPTZ.pm
-<b>-rw-r--r-- 1 root root 9.6K May  9 20:08 TapoC200.pm</b>
--rw-r--r-- 1 root root 5.2K Apr 20 01:34 Toshiba_IK_WB11A.pm
--rw-r--r-- 1 root root  12K Apr 20 01:34 Trendnet.pm
--rw-r--r-- 1 root root  20K Apr 20 01:34 Visca.pm
--rw-r--r-- 1 root root 4.6K Apr 20 01:34 Vivotek_ePTZ.pm
--rw-r--r-- 1 root root 8.9K Apr 20 01:34 WanscamHW0025.pm
--rw-r--r-- 1 root root  13K Apr 20 01:34 Wanscam.pm
+user@zmserver:/usr/share/perl5/ZoneMinder/Control# ls -alh
+-rw-r--r-- 1 root   root    12K Feb 23  2023 3S.pm
+-rw-r--r-- 1 root   root    16K Feb 23  2023 Amcrest_HTTP.pm
+-rw-r--r-- 1 root   root    15K Feb 23  2023 AxisV2.pm
+-rw-r--r-- 1 root   root    18K Feb 23  2023 Dahua.pm
+-rw-r--r-- 1 root   root   4.8K Feb 23  2023 DCS3415.pm
+-rw-r--r-- 1 root   root   7.2K Feb 23  2023 DCS5020L.pm
+-rw-r--r-- 1 root   root    13K Feb 23  2023 DericamP2.pm
+-rw-r--r-- 1 root   root    23K Feb 23  2023 FI8608W_Y2k.pm
+-rw-r--r-- 1 root   root    26K Feb 23  2023 FI8620_Y2k.pm
+-rw-r--r-- 1 root   root   6.2K Feb 23  2023 FI8908W.pm
+-rw-r--r-- 1 root   root   7.6K Feb 23  2023 FI8918W.pm
+-rw-r--r-- 1 root   root    22K Feb 23  2023 FI9821W_Y2k.pm
+-rw-r--r-- 1 root   root    23K Feb 23  2023 FI9831W.pm
+-rw-r--r-- 1 root   root   8.2K Feb 23  2023 Floureon.pm
+-rw-r--r-- 1 root   root   8.7K Feb 23  2023 FoscamCGI.pm
+-rw-r--r-- 1 root   root   9.5K Feb 23  2023 FOSCAMR2C.pm
+-rw-r--r-- 1 root   root    12K Feb 23  2023 HikVision.pm
+-rw-r--r-- 1 root   root   6.9K Feb 23  2023 IPCAMIOS.pm
+-rw-r--r-- 1 root   root   8.1K Feb 23  2023 IPCC7210W.pm
+-rw-r--r-- 1 root   root   6.9K Feb 23  2023 Keekoon.pm
+-rw-r--r-- 1 root   root   9.6K Feb 23  2023 LoftekSentinel.pm
+-rw-r--r-- 1 root   root    11K Feb 23  2023 M8640.pm
+-rw-r--r-- 1 root   root   7.2K Feb 23  2023 MaginonIPC.pm
+-rw-r--r-- 1 root   root   4.6K Feb 23  2023 mjpgStreamer.pm
+-rw-r--r-- 1 root   root   4.6K Feb 23  2023 Ncs370.pm
+-rw-r--r-- 1 root   root    28K Feb 23  2023 Netcat.pm
+-rw-r--r-- 1 root   root    25K Feb 23  2023 onvif.pm
+-rw-r--r-- 1 root   root   6.6K Feb 23  2023 PanasonicIP.pm
+-rw-r--r-- 1 root   root    18K Feb 23  2023 PelcoD.pm
+-rw-r--r-- 1 root   root    19K Feb 23  2023 PelcoP.pm
+-rw-r--r-- 1 root   root   9.7K Feb 23  2023 PSIA.pm
+-rw-r--r-- 1 root   root    39K Feb 23  2023 Reolink.pm
+-rw-r--r-- 1 root   root   6.4K Feb 23  2023 SkyIPCam7xx.pm
+-rw-r--r-- 1 root   root   8.2K Feb 23  2023 Sony.pm
+-rw-r--r-- 1 root   root   7.7K Feb 23  2023 SPP1802SWPTZ.pm
+<b>-rw-r--r-- 1 root   root    14K Aug  6 17:56 TapoC200.pm</b>
+-rw-r--r-- 1 root   root   5.2K Feb 23  2023 Toshiba_IK_WB11A.pm
+-rw-r--r-- 1 root   root    12K Feb 23  2023 Trendnet.pm
+-rw-r--r-- 1 root   root    20K Feb 23  2023 Visca.pm
+-rw-r--r-- 1 root   root   4.6K Feb 23  2023 Vivotek_ePTZ.pm
+-rw-r--r-- 1 root   root   8.9K Feb 23  2023 WanscamHW0025.pm
+-rw-r--r-- 1 root   root    13K Feb 23  2023 Wanscam.pm
 </pre>
 
 ## Step 2 : Add the control script to ZoneMinder
