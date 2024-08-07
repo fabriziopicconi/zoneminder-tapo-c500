@@ -7,20 +7,16 @@ Thanks to [oparm](https://github.com/oparm) for background of this work
 ## Features
 - Pan
 - Tilt
-- Zoom through ZoneMinder
+- Zoom (through ZoneMinder)
 - Sleep : Lens Mask On
 - Wake : Lens Mask Off
-- Up to 8 presets
+- Up to 8 presets (not working at the moment)
 - Reset (camera recalibrates and returns to its default position)
 - Reboot
-
-## Reset & Reboot explanations
 
 ### Reset
 
 The camera will recalibrate by panning and tilting itself.
-
-Or, if you enabled the script debugging, it will reload the script.
 
 ### Reboot
 
@@ -40,7 +36,7 @@ On your system, copy the file named **TapoC200.pm** to **/usr/share/perl5/ZoneMi
 
 ```
 cd /usr/share/perl5/ZoneMinder/Control/
-sudo wget https://raw.githubusercontent.com/oparm/zoneminder-tapo-c200/main/TapoC200.pm
+sudo wget https://github.com/fabriziopicconi/zoneminder-tapo-c500/raw/main/TapoC200.pm
 sudo systemctl restart zoneminder
 ```
 
@@ -228,19 +224,3 @@ my $step = 15;
 https://github.com/JurajNyiri/pytapo
 
 https://github.com/oparm/zoneminder-tapo-c200
-
-https://research.nccgroup.com/2020/07/31/lights-camera-hacked-an-insight-into-the-world-of-popular-ip-cameras/
-
-https://github.com/likaci/mercury-ipc-control
-
-https://github.com/ttimasdf/mercury-ipc-control
-
-http://blog.xiazhiri.com/Mercury-MIPC251C-4-Reverse.html
-
-https://md.depau.eu/s/r1Ys_oWoP#
-
-https://github.com/JurajNyiri/HomeAssistant-Tapo-Control
-
-https://community.home-assistant.io/t/use-pan-tilt-function-for-tp-link-tapo-c200-from-home-assistant/170143/18
-
-https://www.henrychang.ca/foscam-f9821p-v2-control-zoneminder-script/
