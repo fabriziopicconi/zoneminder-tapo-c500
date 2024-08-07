@@ -57,7 +57,7 @@ our $VERSION = $ZoneMinder::Base::VERSION;
 # ==========================================================================
 
 my $tapo_c200_debug = 0;
-my $step = 15;
+my $step = 10;
 
 use ZoneMinder::Logger qw(:all);
 use ZoneMinder::Config qw(:all);
@@ -161,6 +161,24 @@ sub encryptRequest
     my $ciphertext = $cipher->encrypt($msg);
     Debug("encrypted: ".encode_base64($ciphertext,""));
     return($ciphertext);
+}
+sub decryptResponse
+{
+    my $self = shift;
+    my $encmsg = shift;
+    Debug("encmsg: ".encode_base64($encmsg,""));
+
+    my $cipher = Crypt::CBC->new(
+        -key         => $self->{lsk},
+        -iv          => $self->{ivb},
+        -cipher      => 'Cipher::AES',
+        -literal_key => 1,
+        -header      => "none",
+        -padding     => "standard",
+        -keysize     => 16 );
+    my $msg = $cipher->decrypt($encmsg);
+    Debug("clean message: $msg");
+    return($msg);
 }
 
 sub generateEncryptionToken
@@ -311,11 +329,11 @@ sub sendCmd
         }
     }
 }
-
+### MOVE CONTINUOUS
 sub moveConUp
 {
     my $self = shift;
-    printMsg("Move Up");
+    printMsg("Move Con Up");
 
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"0","y_coord":"'.$step.'"}}}');
 }
@@ -323,7 +341,7 @@ sub moveConUp
 sub moveConDown
 {
     my $self = shift;
-    printMsg("Move Down");
+    printMsg("Move Con Down");
 
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"0","y_coord":"-'.$step.'"}}}');
 }
@@ -331,7 +349,7 @@ sub moveConDown
 sub moveConLeft
 {
     my $self = shift;
-    printMsg("Move Left");
+    printMsg("Move Con Left");
 
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"-'.$step.'","y_coord":"0"}}}');
 }
@@ -339,15 +357,14 @@ sub moveConLeft
 sub moveConRight
 {
     my $self = shift;
-    printMsg("Move Right");
-    $self->sendCmd("{'method': 'multipleRequest', 'params': {'requests': [{'method': 'getDeviceInfo', 'params': {'device_info': {'name': ['basic_info']}}}]}}");
+    printMsg("Move Con Right");
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"'.$step.'","y_coord":"0"}}}');
 }
 
 sub moveConUpRight
 {
     my $self = shift;
-    printMsg("Move Diagonally Up Right");
+    printMsg("Move Con Diagonally Up Right");
 
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"'.$step.'","y_coord":"'.$step.'"}}}');
 }
@@ -355,7 +372,7 @@ sub moveConUpRight
 sub moveConDownRight
 {
     my $self = shift;
-    printMsg("Move Diagonally Down Right");
+    printMsg("Move Con Diagonally Down Right");
 
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"'.$step.'","y_coord":"-'.$step.'"}}}');
 }
@@ -363,7 +380,7 @@ sub moveConDownRight
 sub moveConUpLeft
 {
     my $self = shift;
-    printMsg("Move Diagonally Up Left");
+    printMsg("Move Con Diagonally Up Left");
 
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"-'.$step.'","y_coord":"'.$step.'"}}}');
 }
@@ -371,7 +388,7 @@ sub moveConUpLeft
 sub moveConDownLeft
 {
     my $self = shift;
-    printMsg("Move Diagonally Down Left");
+    printMsg("Move Con Diagonally Down Left");
 
     $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"-'.$step.'","y_coord":"-'.$step.'"}}}');
 }
@@ -379,9 +396,73 @@ sub moveConDownLeft
 sub moveStop
 {
     my $self = shift;
-    printMsg("Move Stop");
+    printMsg("Move Con Stop");
 
     $self->sendCmd('{"method":"do","motor":{"stop":"null"}}');
+}
+
+### MOVE RELATIVE
+sub moveRelUp
+{
+    my $self = shift;
+    printMsg("Move ".$step." Up");
+
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"0","y_coord":"'.$step.'"}}}');
+}
+
+sub moveRelDown
+{
+    my $self = shift;
+    printMsg("Move ".$step." Down");
+
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"0","y_coord":"-'.$step.'"}}}');
+}
+
+sub moveRelLeft
+{
+    my $self = shift;
+    printMsg("Move ".$step." Left");
+
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"-'.$step.'","y_coord":"0"}}}');
+}
+
+sub moveRelRight
+{
+    my $self = shift;
+    printMsg("Move ".$step." Right");
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"'.$step.'","y_coord":"0"}}}');
+}
+
+sub moveRelUpRight
+{
+    my $self = shift;
+    printMsg("Move ".$step." Diagonally Up Right");
+
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"'.$step.'","y_coord":"'.$step.'"}}}');
+}
+
+sub moveRelDownRight
+{
+    my $self = shift;
+    printMsg("Move ".$step." Diagonally Down Right");
+
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"'.$step.'","y_coord":"-'.$step.'"}}}');
+}
+
+sub moveRelUpLeft
+{
+    my $self = shift;
+    printMsg("Move ".$step." Diagonally Up Left");
+
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"-'.$step.'","y_coord":"'.$step.'"}}}');
+}
+
+sub moveRelDownLeft
+{
+    my $self = shift;
+    printMsg("Move ".$step." Diagonally Down Left");
+
+    $self->sendCmd('{"method":"do","motor":{"move":{"x_coord":"-'.$step.'","y_coord":"-'.$step.'"}}}');
 }
 
 sub presetGoto
