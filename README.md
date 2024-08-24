@@ -1,6 +1,6 @@
 # ZoneMinder for my Tapo C500 camera control script
 
-A [ZoneMinder](https://zoneminder.com/) PTZ control script for the Tapo C200 camera.
+A [ZoneMinder](https://zoneminder.com/) PTZ control script for the Tapo C500 camera.
 
 Tested on:
 
