@@ -6,7 +6,8 @@ Tested on:
 
 - Ubuntu: 24.04 LTS server
 - zoneminder: 1.36.33
-- Tapo C500: 1.1.4
+- Tapo C500 hardware 1.0: 1.3.4
+- Tapo C500 hardware 2.0: 1.0.7
 
 Thanks to [oparm](https://github.com/oparm) for solid background of this work
 
