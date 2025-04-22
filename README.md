@@ -228,3 +228,5 @@ my $step = 15;
 https://github.com/JurajNyiri/pytapo
 
 https://github.com/oparm/zoneminder-tapo-c200
+
+https://www.tp-link.com/it/support/faq/4416/
