@@ -37,7 +37,7 @@ Images refer to ZoneMinder old version but they are still valid on lastest relea
 Install dependencies :
 
 ```
-sudo apt install libjson-pp-perl libjson-parse-perl
+sudo apt install libjson-pp-perl libjson-parse-perl libbytes-random-secure-perl libcrypt-cbc-perl
 ```
 
 On your system, copy the file named **TapoC200.pm** to **/usr/share/perl5/ZoneMinder/Control/** :
