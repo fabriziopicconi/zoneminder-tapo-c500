@@ -4,6 +4,9 @@
 sudo apt update
 sudo apt -y dist-upgrade
 sudo apt -y install zoneminder
+sudo apt -y install libjson-parse-perl
+sudo apt -y install libbytes-random-secure-perl
+sudo apt -y install libcrypt-cbc-perl
 sudo chmod 740 /etc/zm/zm.conf
 sudo chown root:www-data /etc/zm/zm.conf
 sudo mysql -e "CREATE DATABASE zm;"
