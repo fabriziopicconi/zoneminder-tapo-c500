@@ -32,7 +32,10 @@ It does indeed reboot the camera...
 ## Step 1 : Install the script on the system
 
 This was tested on Ubuntu Server 24.04, just after installing ZoneMinder (following their wiki).
+
 Images refer to ZoneMinder old version but they are still valid on lastest release.
+
+@script folder thereis a little bash script to install zoneminder in ubuntu 24.04 OS
 
 Install dependencies :
 
