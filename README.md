@@ -4,10 +4,10 @@ A [ZoneMinder](https://zoneminder.com/) PTZ control script for the Tapo C500 cam
 
 Tested on:
 
-- Ubuntu: 24.04 LTS server
-- zoneminder: 1.36.33
-- Tapo C500 hardware 1.0: 1.3.4
-- Tapo C500 hardware 2.0: 1.0.7
+- Ubuntu: 26.04 LTS server
+- zoneminder: 1.38.4
+- Tapo C500 hardware 1.0: 1.3.7
+- Tapo C500 hardware 2.0: 1.3.4
 
 Thanks to [oparm](https://github.com/oparm) for solid background of this work
 
